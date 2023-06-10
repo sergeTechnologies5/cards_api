@@ -55,7 +55,7 @@ public class CardController {
 
     @GetMapping
     @Operation(
-            summary = "Retrieve all cards by by user",
+            summary = "Retrieve all cards for a user",
             description = "fetch all user cards from the database",
             tags = {"fetch", "get"})
     @ApiResponses({
