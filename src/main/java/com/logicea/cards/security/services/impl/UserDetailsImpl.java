@@ -1,4 +1,4 @@
-package com.logicea.cards.security.services;
+package com.logicea.cards.security.services.impl;
 
 import com.logicea.cards.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
