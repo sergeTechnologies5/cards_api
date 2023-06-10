@@ -12,6 +12,7 @@ import com.logicea.cards.repository.CardRepository;
 import com.logicea.cards.repository.UserRepository;
 import com.logicea.cards.security.services.CardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,12 +21,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CardServiceImpl implements CardService {
 
     private final UserRepository userRepository;
@@ -99,7 +105,10 @@ public class CardServiceImpl implements CardService {
     public ResponseEntity<?> getCards(CardFilter cardFilter) {
         var sort = Sort.by(Sort.Direction.DESC, "color").and(Sort.by(Sort.Direction.ASC, "status")).and(Sort.by(Sort.Direction.ASC, "createdOn"));
         Pageable paging = PageRequest.of(cardFilter.getPage(), cardFilter.getSize(), sort);
-        var pageCards = cardRepository.findByColorAndNameAndStatusAndCreatedOn(cardFilter.getColor(), cardFilter.getName(), Status.valueOf(cardFilter.getStatus()), cardFilter.getDate(), paging);
+
+        ZonedDateTime dateTime = convertDate(cardFilter.getDate());
+
+        var pageCards = cardRepository.findByColorContainingAndNameContainingAndStatusAndCreatedOn(cardFilter.getColor(), cardFilter.getName(), Status.valueOf(cardFilter.getStatus()),dateTime, paging);
         Map<String, Object> response = new HashMap<>();
         var cards = pageCards.getContent();
         response.put("cards", CardMapper.toCardDtos(cards));
@@ -107,6 +116,13 @@ public class CardServiceImpl implements CardService {
         response.put("totalItems", pageCards.getTotalElements());
         response.put("totalPages", pageCards.getTotalPages());
         return ResponseEntity.ok(CardRes.builder().message("Card not Found for Update").status(0).data(response).build());
+    }
+
+    private ZonedDateTime convertDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date_ = LocalDate.parse(date, formatter);
+        ZonedDateTime result = date_.atStartOfDay(ZoneId.systemDefault());
+        return result;
     }
 
     @Override

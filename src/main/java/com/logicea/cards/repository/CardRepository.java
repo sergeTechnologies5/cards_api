@@ -12,5 +12,5 @@ import java.time.ZonedDateTime;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long>, PagingAndSortingRepository<Card, Long> {
-    Page<Card> findByColorAndNameAndStatusAndCreatedOn(String color, String name, Status status, ZonedDateTime createdOn, Pageable pageable);
+    Page<Card> findByColorContainingAndNameContainingAndStatusAndCreatedOn(String color, String name, Status status, ZonedDateTime createdOn, Pageable pageable);
 }
