@@ -5,8 +5,8 @@ import com.logicea.cards.models.Role;
 import com.logicea.cards.models.User;
 import com.logicea.cards.payload.request.LoginReq;
 import com.logicea.cards.payload.request.SignupReq;
-import com.logicea.cards.payload.response.JwtResponse;
-import com.logicea.cards.payload.response.MessageResponse;
+import com.logicea.cards.payload.response.JwtResp;
+import com.logicea.cards.payload.response.MessageResp;
 import com.logicea.cards.repository.RoleRepository;
 import com.logicea.cards.repository.UserRepository;
 import com.logicea.cards.security.jwt.JwtUtils;
@@ -55,7 +55,7 @@ public class AuthController {
             description = "Get a token to use in calling subsequent endpoints",
             tags = {"login", "post"})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = JwtResponse.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = JwtResp.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", content = {@Content(schema = @Schema())}),
             @ApiResponse(responseCode = "500", content = {@Content(schema = @Schema())})})
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginReq loginReq) {
@@ -71,7 +71,7 @@ public class AuthController {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
+        return ResponseEntity.ok(new JwtResp(jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
@@ -84,19 +84,19 @@ public class AuthController {
             description = "Use the endpoint to create a user into the system",
             tags = {"signup", "post"})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = MessageResponse.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = MessageResp.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", content = {@Content(schema = @Schema())}),
             @ApiResponse(responseCode = "500", content = {@Content(schema = @Schema())})})
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupReq signUpReq) {
         if (userRepository.existsByUsername(signUpReq.getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+                    .body(new MessageResp("Error: Username is already taken!"));
         }
         if (userRepository.existsByEmail(signUpReq.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+                    .body(new MessageResp("Error: Email is already in use!"));
         }
         User user = new User(signUpReq.getUsername(),
                 signUpReq.getEmail(),
@@ -126,6 +126,6 @@ public class AuthController {
         }
         user.setRoles(roles);
         userRepository.save(user);
-        return ResponseEntity.ok(new MessageResponse("User created successfully!"));
+        return ResponseEntity.ok(new MessageResp("User created successfully!"));
     }
 }

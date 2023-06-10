@@ -3,7 +3,6 @@ package com.logicea.cards.api;
 import com.logicea.cards.payload.request.CardFilter;
 import com.logicea.cards.payload.request.CardReq;
 import com.logicea.cards.payload.response.CardRes;
-import com.logicea.cards.payload.response.JwtResponse;
 import com.logicea.cards.security.services.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
